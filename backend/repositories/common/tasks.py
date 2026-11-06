@@ -11,11 +11,12 @@ import logging
 
 db_logger = logging.getLogger('database')
 
+
 async def validation_task(
     project_id: int,
     column_id: int,
     session: SessionDep,
-) -> None: 
+) -> None:
 
     db_logger.debug(
         "Validation task started: project_id = %s column_id = %s",
@@ -29,7 +30,7 @@ async def validation_task(
         .where(
             Column.id == column_id,
             Board.project_id == project_id,
-        )   
+        )
     )
 
     column = await session.scalar(stmt)
@@ -44,7 +45,8 @@ async def validation_task(
 
         raise column_not_found()
 
-    db_logger.debug("Validation task successfuly: project_id = %s column_id = %s",
+    db_logger.debug(
+        "Validation task successfuly: project_id = %s column_id = %s",
         project_id,
         column_id
     )

@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from .projects import Project
     from .users import User
 
+
 class ProjectMember(Base):
     __tablename__ = "project_members"
 
@@ -22,7 +23,6 @@ class ProjectMember(Base):
         String(50),
         default=UserRole.member
     )
-
 
     project: Mapped["Project"] = relationship(
         back_populates="members",

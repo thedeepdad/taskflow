@@ -1,4 +1,5 @@
 from .auth import (
+    db_verify_email,
     get_user,
     add_user
 )
@@ -35,7 +36,7 @@ from .columns import (
     db_get_column,
     db_update_column,
     db_delete_column
-) 
+)
 from .tasks import (
     db_delete_task,
     db_add_task,
@@ -43,7 +44,7 @@ from .tasks import (
     db_get_task,
     db_update_task
 )
-from .comments import(
+from .comments import (
     db_delete_comment,
     db_update_comment,
     db_add_comment,
@@ -55,7 +56,7 @@ from .comments import(
 __all__ = (
     'db_get_tasks_me',
     'db_get_projects_me',   # users
-    'db_get_all_users',    
+    'db_get_all_users',
     'db_delete_user',
     'db_update_user',
     'db_update_me',
@@ -63,12 +64,13 @@ __all__ = (
     'db_get_user',
     'get_user',            # auth
     'add_user',
+    'db_verify_email',
     'db_get_project',      # projects
-    'db_update_project', 
+    'db_update_project',
     'db_delete_project',
     'db_change_member',
     'db_delete_member',
-    'db_get_projects',    
+    'db_get_projects',
     'db_add_project',
     'db_get_project',
     'db_get_members',

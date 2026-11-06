@@ -8,6 +8,8 @@ if TYPE_CHECKING:
     from .projects_member import ProjectMember
     from .tasks import Task
     from .comments import Comment
+    from .registrations_codes import RegistrationCode
+
 
 class User(Base):
     __tablename__ = "users"
@@ -40,4 +42,9 @@ class User(Base):
         back_populates="author",
         init=False
     )
-
+    registration_code: Mapped["RegistrationCode | None"] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+        uselist=False,
+        init=False
+    )

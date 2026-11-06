@@ -8,17 +8,18 @@ if TYPE_CHECKING:
     from .tasks import Task
     from .users import User
 
+
 class Comment(Base):
     __tablename__ = "comments"
 
     id: Mapped[int] = mapped_column(primary_key=True, init=False)
     text: Mapped[str] = mapped_column(Text)
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
         init=False
     )
-
 
     task_id: Mapped[int] = mapped_column(
         ForeignKey("tasks.id")
@@ -27,7 +28,6 @@ class Comment(Base):
     author_id: Mapped[int] = mapped_column(
         ForeignKey("users.id")
     )
-
 
     task: Mapped["Task"] = relationship(
         back_populates="comments",

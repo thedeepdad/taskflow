@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from .column import Column
     from .comments import Comment
 
+
 class Task(Base):
     __tablename__ = "tasks"
 
@@ -28,7 +29,6 @@ class Task(Base):
         onupdate=func.now(),
         init=False
     )
-
 
     project_id: Mapped[int] = mapped_column(
         ForeignKey("projects.id", ondelete='CASCADE')
@@ -49,8 +49,7 @@ class Task(Base):
         DateTime(timezone=True),
         nullable=True,
         default=None
-    )    
-
+    )
 
     project: Mapped["Project"] = relationship(
         back_populates="tasks",

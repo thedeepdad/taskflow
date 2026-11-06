@@ -4,15 +4,17 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker
 )
 from sqlalchemy.orm import (
-    MappedAsDataclass, 
+    MappedAsDataclass,
     DeclarativeBase
-) 
-from sqlalchemy import NullPool
+)
 from typing import Annotated
 from fastapi import Depends
 from config.settings import settings
 
-class Base(MappedAsDataclass, DeclarativeBase): pass
+
+class Base(MappedAsDataclass, DeclarativeBase):
+    pass
+
 
 engine = create_async_engine(
     url=settings.async_db_url,
@@ -24,10 +26,9 @@ async_session = async_sessionmaker(
     expire_on_commit=False
 )
 
-async def get_session(): 
+
+async def get_session():
     async with async_session() as session:
         yield session
 
-SessionDep = Annotated[AsyncSession, Depends(get_session)] 
-
-
+SessionDep = Annotated[AsyncSession, Depends(get_session)]

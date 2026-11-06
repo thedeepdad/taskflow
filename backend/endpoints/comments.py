@@ -1,29 +1,29 @@
 from config import (
-    Prefix, 
-    Tags, 
+    Prefix,
+    Tags,
     SessionDep)
 
 from models import (
     ResponseComment,
     CreateComment,
     UpdateComment,
-    User, 
+    User,
 )
 
 from fastapi import (
-    APIRouter, 
-    status, 
+    APIRouter,
+    status,
     Depends
 )
 from repositories import (
     db_delete_comment,
     db_update_comment,
-    db_add_comment, 
+    db_add_comment,
     db_get_comments,
     db_get_comment
 )
 from dependencies import (
-    requier_project_member, 
+    requier_project_member,
     requier_comment_owner_or_manager
 )
 from typing import Annotated
@@ -35,6 +35,7 @@ router = APIRouter(
     prefix=Prefix.comments,
     tags=[Tags.comments]
 )
+
 
 @router.post(
     '',
@@ -48,10 +49,11 @@ async def add_comment(
     data: CreateComment,
     session: SessionDep,
     current_user: Annotated[User, Depends(requier_project_member)]
-): 
+):
 
     logger.info(
-        "Create comment: project_id = %s column_id = %s task_id = %s user_id = %s",
+        "Create comment: project_id = %s "
+        "column_id = %s task_id = %s user_id = %s",
         project_id,
         column_id,
         task_id,
@@ -68,7 +70,8 @@ async def add_comment(
     )
 
     logger.info(
-        "Created comment: project_id = %s column_id = %s task_id = %s user_id = %s",
+        "Created comment: project_id = %s "
+        "column_id = %s task_id = %s user_id = %s",
         project_id,
         column_id,
         task_id,
@@ -76,6 +79,7 @@ async def add_comment(
     )
 
     return comment
+
 
 @router.get(
     '',
@@ -87,10 +91,11 @@ async def get_comments(
     task_id: int,
     session: SessionDep,
     current_user: Annotated[User, Depends(requier_project_member)]
-): 
+):
 
     logger.info(
-        "Get comments: project_id = %s column_id = %s task_id = %s user_id = %s",
+        "Get comments: project_id = %s column_id = %s "
+        "task_id = %s user_id = %s",
         project_id,
         column_id,
         task_id,
@@ -106,7 +111,8 @@ async def get_comments(
     )
 
     logger.info(
-        "Comments retrieved: project_id = %s column_id = %s task_id = %s user_id = %s",
+        "Comments retrieved: project_id = %s column_id = %s "
+        "task_id = %s user_id = %s",
         project_id,
         column_id,
         task_id,
@@ -114,6 +120,7 @@ async def get_comments(
     )
 
     return comments
+
 
 @router.get(
     '/{comment_id}',
@@ -126,10 +133,11 @@ async def get_comment(
     comment_id: int,
     session: SessionDep,
     current_user: Annotated[User, Depends(requier_project_member)]
-): 
+):
 
     logger.info(
-        "Get comment: project_id = %s column_id = %s task_id = %s comment_id = %s user_id = %s",
+        "Get comment: project_id = %s column_id = %s "
+        "task_id = %s comment_id = %s user_id = %s",
         project_id,
         column_id,
         task_id,
@@ -146,7 +154,8 @@ async def get_comment(
     )
 
     logger.info(
-        "Comment retrieved: project_id = %s column_id = %s task_id = %s comment_id = %s user_id = %s",
+        "Comment retrieved: project_id = %s column_id = %s "
+        "task_id = %s comment_id = %s user_id = %s",
         project_id,
         column_id,
         task_id,
@@ -155,6 +164,7 @@ async def get_comment(
     )
 
     return comment
+
 
 @router.patch(
     '/{comment_id}',
@@ -168,10 +178,11 @@ async def update_comment(
     data: UpdateComment,
     session: SessionDep,
     current_user: Annotated[User, Depends(requier_comment_owner_or_manager)]
-): 
+):
 
     logger.info(
-        "Update comment: project_id = %s column_id = %s task_id = %s comment_id = %s user_id = %s",
+        "Update comment: project_id = %s column_id = %s "
+        "task_id = %s comment_id = %s user_id = %s",
         project_id,
         column_id,
         task_id,
@@ -189,15 +200,17 @@ async def update_comment(
     )
 
     logger.info(
-        "Comment updated: project_id = %s column_id = %s task_id = %s comment_id = %s user_id = %s",
+        "Comment updated: project_id = %s column_id = %s "
+        "task_id = %s comment_id = %s user_id = %s",
         project_id,
         column_id,
         task_id,
         comment_id,
         current_user.id
-    ) 
+    )
 
     return comment
+
 
 @router.delete(
     '/{comment_id}',
@@ -210,16 +223,17 @@ async def delete_comment(
     comment_id: int,
     session: SessionDep,
     current_user: Annotated[User, Depends(requier_comment_owner_or_manager)]
-): 
+):
 
     logger.info(
-        "Delete comment: project_id = %s column_id = %s task_id = %s comment_id = %s user_id = %s",
+        "Delete comment: project_id = %s column_id = %s "
+        "task_id = %s comment_id = %s user_id = %s",
         project_id,
         column_id,
         task_id,
         comment_id,
         current_user.id
-    ) 
+    )
 
     await db_delete_comment(
         project_id,
@@ -230,7 +244,8 @@ async def delete_comment(
     )
 
     logger.info(
-        "Comment deleted: : project_id = %s column_id = %s task_id = %s comment_id = %s user_id = %s",
+        "Comment deleted: : project_id = %s column_id = %s "
+        "task_id = %s comment_id = %s user_id = %s",
         project_id,
         column_id,
         task_id,

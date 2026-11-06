@@ -1,25 +1,27 @@
 from fastapi import (
     HTTPException,
-    APIRouter, 
+    APIRouter,
     Response,
-    Request, 
-    status, 
+    Request,
+    status,
     Form
 )
 from security import (
     verify_password,
-    hash_password, 
+    hash_password,
     encode_token,
     decode_token
 )
 from models import (
     ResponseAuthMe,
-    Register, 
-    Login, 
+    VerifyEmail,
+    Register,
+    Login,
 )
 from repositories import (
     get_user,
-    add_user
+    add_user,
+    db_verify_email
 )
 from jwt.exceptions import InvalidTokenError
 from config import SessionDep, Prefix, Tags
@@ -32,14 +34,15 @@ router = APIRouter(prefix=Prefix.auth, tags=[Tags.auth])
 
 
 @router.post(
-    '/register', 
+    '/register',
     status_code=status.HTTP_201_CREATED
 )
 async def register(
-    data: Annotated[Register, Form()],
+    data: Register,
     session: SessionDep,
-    response: Response
-) -> dict[str, str]: 
+    response: Response,
+    request: Request
+) -> dict[str, str]:
 
     logger.info("User register started")
 
@@ -47,6 +50,7 @@ async def register(
 
     user = await add_user(
         session,
+        request,
         data,
         hashed_password
     )
@@ -72,7 +76,7 @@ async def register(
         key='refresh_token',
         value=refresh_token,
         httponly=True,
-        samesite='lax'        
+        samesite='lax'
     )
 
     logger.info("User registere successful")
@@ -87,7 +91,7 @@ async def login(
     data: Annotated[Login, Form()],
     session: SessionDep,
     response: Response
-) -> dict[str, str]: 
+) -> dict[str, str]:
 
     logger.info("User login started")
 
@@ -123,14 +127,14 @@ async def login(
         key='refresh_token',
         value=refresh_token,
         httponly=True,
-        samesite='lax'        
+        samesite='lax'
     )
 
     logger.info("User login successful")
 
     return {
         'message': 'user loged'
-    }   
+    }
 
 
 @router.post(
@@ -140,7 +144,7 @@ async def login(
 async def refresh(
     request: Request,
     response: Response
-) -> None: 
+) -> None:
 
     refresh_token = request.cookies.get('refresh_token')
 
@@ -152,13 +156,13 @@ async def refresh(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='Refresh token is missing'
         )
-    
+
     try:
         refresh_payload = decode_token(refresh_token)
     except InvalidTokenError:
         logger.warning(
             "Token refresh failed: invalid refresh token"
-        ) 
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='Could not validate refresh token'
@@ -173,7 +177,6 @@ async def refresh(
         'sub': refresh_payload.get('sub'),
         'name': refresh_payload.get('name')
     }
-
 
     access_token = encode_token(payload)
     refresh_token = encode_token(payload, refresh=True)
@@ -198,7 +201,7 @@ async def refresh(
 
 
 @router.post(
-    '/logout', 
+    '/logout',
     status_code=status.HTTP_204_NO_CONTENT
 )
 async def logout(
@@ -206,7 +209,7 @@ async def logout(
 ) -> None:
 
     logger.info("User logout started")
-    
+
     response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')
 
@@ -217,10 +220,10 @@ async def logout(
 async def me(
     request: Request,
     session: SessionDep
-) -> ResponseAuthMe: 
+) -> ResponseAuthMe:
 
     logger.info("Get user data: request started")
-    
+
     access_token = request.cookies.get('access_token')
 
     if not access_token:
@@ -243,7 +246,20 @@ async def me(
 
     logger.info(
         "Get user data: user_id = %s",
-        data.id 
-    )  
+        data.id
+    )
 
     return data
+
+
+@router.post("/verify-email")
+async def verify_email(
+    session: SessionDep,
+    data: VerifyEmail
+):
+
+    logger.info("Start verification code")
+
+    await db_verify_email(session, data)
+
+    logger.info("Code verificated")

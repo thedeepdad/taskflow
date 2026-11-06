@@ -1,5 +1,5 @@
 from exceptions.http import (
-    project_not_found, 
+    project_not_found,
     board_not_found
 )
 from config import SessionDep
@@ -12,8 +12,8 @@ logger = logging.getLogger('database')
 
 async def requier_board(
     project_id: int,
-    session: SessionDep    
-) -> Board: 
+    session: SessionDep
+) -> Board:
 
     project = await session.get(Project, project_id)
 
@@ -26,8 +26,7 @@ async def requier_board(
 
         raise project_not_found()
 
-    stmt = select(Board)\
-    .where(Board.project_id == project_id)
+    stmt = select(Board).where(Board.project_id == project_id)
 
     board = await session.scalar(stmt)
 
@@ -41,4 +40,3 @@ async def requier_board(
         raise board_not_found()
 
     return board
-    

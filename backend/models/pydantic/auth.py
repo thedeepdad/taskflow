@@ -1,14 +1,21 @@
 from pydantic import BaseModel, EmailStr
 
-class Login(BaseModel): 
+
+class Login(BaseModel):
     username: str
     password: str
 
-class Register(Login): 
+
+class Register(Login):
     email: EmailStr
+
 
 class ResponseAuthMe(BaseModel):
     id: int
     username: str
     email: str
 
+
+class VerifyEmail(BaseModel):
+    email: EmailStr
+    code: str

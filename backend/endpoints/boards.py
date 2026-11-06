@@ -1,16 +1,16 @@
 from config import (
     SessionDep,
-    Prefix, 
-    Tags, 
+    Prefix,
+    Tags,
 )
 from models import (
     ResponseBoard,
     CreateBoard,
-    UpdateBoard, 
+    UpdateBoard,
     User
 )
 from fastapi import (
-    APIRouter, 
+    APIRouter,
     status,
     Depends
 )
@@ -18,10 +18,10 @@ from repositories import (
     db_delete_board,
     db_update_board,
     db_get_board,
-    db_add_board, 
+    db_add_board,
 )
 from dependencies import (
-    requier_project_manager, 
+    requier_project_manager,
     requier_project_member
 )
 from typing import Annotated
@@ -46,13 +46,14 @@ async def add_board(
     data: CreateBoard,
     session: SessionDep,
     current_user: Annotated[User, Depends(requier_project_manager)]
-): 
+):
 
-    logger.info("Create board: project_id = %s user_id = %s",
+    logger.info(
+        "Create board: project_id = %s user_id = %s",
         project_id,
         current_user.id
     )
-    
+
     board = await db_add_board(
         project_id,
         data,
@@ -60,13 +61,15 @@ async def add_board(
         current_user
     )
 
-    logger.info("Board created: project_id = %s board_id = %s user_id = %s",
+    logger.info(
+        "Board created: project_id = %s board_id = %s user_id = %s",
         project_id,
         board.id,
         current_user.id
     )
 
     return board
+
 
 @router.get(
     '',
@@ -76,24 +79,27 @@ async def get_board(
     project_id: int,
     session: SessionDep,
     current_user: Annotated[User, Depends(requier_project_member)]
-): 
-    logger.info("Get board: project_id = %s user_id = %s",
+):
+    logger.info(
+        "Get board: project_id = %s user_id = %s",
         project_id,
         current_user.id
     )
-    
+
     board = await db_get_board(
         project_id,
         session
     )
 
-    logger.info("Board retrieved: project_id = %s board_id = %s user_id = %s",
+    logger.info(
+        "Board retrieved: project_id = %s board_id = %s user_id = %s",
         project_id,
         board.id,
         current_user.id
     )
 
     return board
+
 
 @router.patch(
     '',
@@ -104,26 +110,29 @@ async def update_board(
     session: SessionDep,
     data: UpdateBoard,
     current_user: Annotated[User, Depends(requier_project_manager)]
-): 
+):
 
-    logger.info("Update board: project_id = %s user_id = %s",
+    logger.info(
+        "Update board: project_id = %s user_id = %s",
         project_id,
         current_user.id
     )
-    
+
     board = await db_update_board(
         project_id,
         session,
         data
     )
 
-    logger.info("Board updated: project_id = %s board_id = %s user_id = %s",
+    logger.info(
+        "Board updated: project_id = %s board_id = %s user_id = %s",
         project_id,
         board.id,
         current_user.id
     )
 
     return board
+
 
 @router.delete(
     '',
@@ -133,19 +142,21 @@ async def delete_board(
     project_id: int,
     session: SessionDep,
     current_user: Annotated[User, Depends(requier_project_manager)]
-): 
+):
 
-    logger.info("Delete board: proejct_id = %s user_id = %s",
+    logger.info(
+        "Delete board: proejct_id = %s user_id = %s",
         project_id,
         current_user.id
     )
-    
+
     await db_delete_board(
         project_id,
         session
     )
 
-    logger.info("Board deleted: project_id = %s user_id = %s",
+    logger.info(
+        "Board deleted: project_id = %s user_id = %s",
         project_id,
         current_user.id
     )

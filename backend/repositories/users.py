@@ -1,8 +1,8 @@
 from models import (
-    UpdateUser, 
+    UpdateUser,
     UpdateMe,
-    Project, 
-    User, 
+    Project,
+    User,
     Task
 )
 from exceptions.http import (
@@ -41,13 +41,13 @@ async def db_get_all_users(
 async def db_get_user(
     session: SessionDep,
     user_id: int
-) -> User: 
+) -> User:
 
     db_logger.info(
         "Get user started: user_id = %s",
         user_id
     )
-    
+
     result = await session.get(User, user_id)
 
     if result is None:
@@ -71,7 +71,7 @@ async def db_update_user(
     user_id: int,
     session: SessionDep,
     data: UpdateUser
-) -> User: 
+) -> User:
 
     db_logger.info(
         "Change user started: user_id = %s",
@@ -90,8 +90,7 @@ async def db_update_user(
         raise user_not_found()
 
     if data.username is not None:
-        stmt = select(User)\
-        .where(
+        stmt = select(User).where(
             User.username == data.username,
             User.id != user.id
         )
@@ -110,8 +109,7 @@ async def db_update_user(
         user.username = data.username
 
     if data.email is not None:
-        stmt = select(User)\
-        .where(
+        stmt = select(User).where(
             User.email == data.email,
             User.id != user.id
         )
@@ -140,23 +138,22 @@ async def db_update_user(
         "User changed successfully: user_id = %s",
         user_id
     )
-    
+
     return user
 
 
 async def db_delete_user(
     user_id: int,
     session: SessionDep
-) -> None: 
+) -> None:
 
     db_logger.info(
         "Delete user started: user_id = %s",
         user_id
     )
-    
-    stmt = delete(User)\
-    .where(User.id == user_id)
-    
+
+    stmt = delete(User).where(User.id == user_id)
+
     result = await session.execute(stmt)
 
     if result.rowcount == 0:
@@ -181,7 +178,7 @@ async def db_update_me(
     data: UpdateMe,
     session: SessionDep,
     user: User
-) -> User: 
+) -> User:
 
     db_logger.info(
         "Update user data started: user_id = %s",
@@ -189,8 +186,7 @@ async def db_update_me(
     )
 
     if data.username is not None:
-        stmt = select(User)\
-        .where(
+        stmt = select(User).where(
             User.username == data.username,
             User.id != user.id
         )
@@ -208,8 +204,7 @@ async def db_update_me(
         user.username = data.username
 
     if data.email is not None:
-        stmt = select(User)\
-        .where(
+        stmt = select(User).where(
             User.email == data.email,
             User.id != user.id
         )
@@ -247,22 +242,21 @@ async def db_delete_me(
         "Delete user started: user_id = %s",
         user.id
     )
-     
-    stmt = delete(User)\
-    .where(User.id == user.id)
+
+    stmt = delete(User).where(User.id == user.id)
 
     result = await session.execute(stmt)
 
     if result.rowcount == 0:
         await session.rollback()
-        
+
         db_logger.warning(
             "User not found: user_id = %s",
             user.id
         )
 
         raise user_not_found()
-    
+
     await execute_commit(session)
 
     db_logger.info(
@@ -274,15 +268,14 @@ async def db_delete_me(
 async def db_get_projects_me(
     session: SessionDep,
     user: User
-): 
+):
 
     db_logger.info(
         "Get projects started: user_id = %s",
         user.id
     )
-    
-    stmt = select(Project)\
-    .where(Project.owner_id == user.id)
+
+    stmt = select(Project).where(Project.owner_id == user.id)
 
     result = await execute_scalars(
         session,
@@ -300,15 +293,14 @@ async def db_get_projects_me(
 async def db_get_tasks_me(
     session: SessionDep,
     user: User
-): 
+):
 
     db_logger.info(
         "Get project started: user_id = %s",
         user.id
     )
-    
-    stmt = select(Task)\
-    .where(Task.assignee_id == user.id)
+
+    stmt = select(Task).where(Task.assignee_id == user.id)
 
     tasks = await execute_scalars(
         session,
@@ -318,4 +310,3 @@ async def db_get_tasks_me(
     db_logger.info("Project retrieved: user_id = %s", user.id)
 
     return tasks.all()
-    

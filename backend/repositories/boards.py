@@ -1,14 +1,14 @@
 from models import (
     ProjectMember,
     UpdateBoard,
-    CreateBoard, 
-    Project, 
-    Board, 
+    CreateBoard,
+    Project,
+    Board,
     User
 )
 from exceptions.http import (
-    project_not_found, 
-    requier_member, 
+    project_not_found,
+    requier_member,
     board_already_exists,
     board_not_found
 )
@@ -19,19 +19,20 @@ import logging
 
 logger = logging.getLogger('database')
 
+
 async def db_add_board(
     project_id: int,
     data: CreateBoard,
     session: SessionDep,
     user: User
-): 
+):
 
     logger.info(
         "Create board started: project_id = %s user_id = %s",
         project_id,
         user.id
     )
-    
+
     project = await session.get(Project, project_id)
 
     if project is None:
@@ -44,8 +45,7 @@ async def db_add_board(
 
         raise project_not_found()
 
-    stmt = select(ProjectMember)\
-    .where(
+    stmt = select(ProjectMember).where(
         ProjectMember.project_id == project_id,
         ProjectMember.user_id == user.id
     )
@@ -55,15 +55,15 @@ async def db_add_board(
     if member is None:
 
         logger.warning(
-            "User is not a member of this project: project_id = %s user_id = %s",
+            "User is not a member of this project: "
+            "project_id = %s user_id = %s",
             project_id,
             user.id
         )
 
         raise requier_member()
 
-    stmt = select(Board)\
-    .where(Board.project_id == project_id)
+    stmt = select(Board).where(Board.project_id == project_id)
 
     board = await session.scalar(stmt)
 
@@ -96,18 +96,18 @@ async def db_add_board(
 
     return board
 
+
 async def db_get_board(
     project_id: int,
     session: SessionDep
-): 
+):
 
     logger.info(
         "Get board started: project_id = %s",
         project_id
     )
-    
-    stmt = select(Board)\
-    .where(Board.project_id == project_id)
+
+    stmt = select(Board).where(Board.project_id == project_id)
 
     board = await session.scalar(stmt)
 
@@ -127,19 +127,19 @@ async def db_get_board(
 
     return board
 
+
 async def db_update_board(
     project_id: int,
     session: SessionDep,
     data: UpdateBoard
-): 
+):
 
     logger.info(
         "Update board started: project_id = %s",
         project_id
     )
-    
-    stmt = select(Board)\
-    .where(Board.project_id == project_id)
+
+    stmt = select(Board).where(Board.project_id == project_id)
 
     board = await session.scalar(stmt)
 
@@ -151,7 +151,7 @@ async def db_update_board(
         )
 
         raise board_not_found()
-    
+
     board.name = data.name
 
     await execute_commit(session)
@@ -165,18 +165,18 @@ async def db_update_board(
 
     return board
 
+
 async def db_delete_board(
     project_id: int,
     session: SessionDep
-): 
+):
 
     logger.info(
         "Delete board started: project_id = %s",
         project_id
     )
-    
-    stmt = delete(Board)\
-    .where(Board.project_id == project_id)
+
+    stmt = delete(Board).where(Board.project_id == project_id)
 
     result = await session.execute(stmt)
     await execute_commit(session)

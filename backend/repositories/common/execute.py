@@ -1,14 +1,15 @@
 from config import SessionDep
 from sqlalchemy.exc import OperationalError, IntegrityError
 from exceptions.http import database_unvailable
-import logging 
+import logging
 
 db_logger = logging.getLogger('database')
+
 
 async def execute_scalars(
     session: SessionDep,
     stmt
-): 
+):
     try:
         result = await session.scalars(stmt)
     except OperationalError:
@@ -18,10 +19,11 @@ async def execute_scalars(
 
     return result
 
+
 async def execute_commit(
     session: SessionDep
-): 
-    try: 
+):
+    try:
         await session.commit()
     except IntegrityError:
 

@@ -1,16 +1,16 @@
 from models import (
     CreateProject,
-    UpdateProject, 
+    UpdateProject,
     ProjectMember,
     CreateMember,
     UpdateMember,
-    Project, 
+    Project,
     User
-) 
+)
 from exceptions.http import (
     member_already_exists,
-    project_not_found, 
-    user_not_found, 
+    project_not_found,
+    user_not_found,
     member_not_found,
 )
 from config import SessionDep, UserRole
@@ -20,11 +20,12 @@ import logging
 
 db_logger = logging.getLogger('database')
 
+
 async def db_add_project(
     data: CreateProject,
     session: SessionDep,
     user: User
-) -> Project: 
+) -> Project:
 
     db_logger.info(
         "Create project started: user_id = %s",
@@ -64,7 +65,7 @@ async def db_add_project(
 
 async def db_get_projects(
     session: SessionDep,
-) -> list[Project]: 
+) -> list[Project]:
 
     db_logger.debug(
         "Get projects started"
@@ -81,15 +82,15 @@ async def db_get_projects(
 
     return result.all()
 
+
 async def db_get_project(
     project_id: int,
     session: SessionDep,
 ) -> Project:
 
     db_logger.info("Get proeject started: project_id = %s", project_id)
-     
-    stmt = select(Project)\
-    .where(Project.id == project_id)
+
+    stmt = select(Project).where(Project.id == project_id)
 
     project = await session.scalar(stmt)
 
@@ -103,16 +104,16 @@ async def db_get_project(
 
     return project
 
+
 async def db_update_project(
     project_id: int,
     data: UpdateProject,
     session: SessionDep,
-): 
+):
 
     db_logger.info("Update project started: project_id = %s", project_id)
 
-    stmt = select(Project)\
-    .where(Project.id == project_id)
+    stmt = select(Project).where(Project.id == project_id)
 
     project = await session.scalar(stmt)
 
@@ -121,19 +122,20 @@ async def db_update_project(
         db_logger.warning("Project not found: project_id = %s", project_id)
 
         raise project_not_found()
-    
+
     if data.name is not None:
         project.name = data.name
     if data.description is not None:
         project.description = data.description
 
     await execute_commit(session)
-    
+
     await session.refresh(project)
 
     db_logger.info("Project updated: project_id = %s", project_id)
 
     return project
+
 
 async def db_delete_project(
     project_id: int,
@@ -141,7 +143,7 @@ async def db_delete_project(
 ) -> None:
 
     db_logger.info("Delete project started: project_id = %s", project_id)
-    
+
     stmt = delete(Project).where(Project.id == project_id)
     result = await session.execute(stmt)
 
@@ -153,8 +155,9 @@ async def db_delete_project(
         raise project_not_found()
 
     await execute_commit(session)
-    
+
     db_logger.info("Project deleted: project_id = %s", project_id)
+
 
 async def db_get_members(
     project_id: int,
@@ -163,9 +166,9 @@ async def db_get_members(
 
     db_logger.info("Get members started: project_id = %s", project_id)
 
-    stmt = select(User)\
-    .join(ProjectMember, ProjectMember.user_id == User.id)\
-    .where(ProjectMember.project_id == project_id)
+    stmt = select(User).join(
+        ProjectMember, ProjectMember.user_id == User.id
+    ).where(ProjectMember.project_id == project_id)
 
     result = await execute_scalars(
         session,
@@ -176,24 +179,25 @@ async def db_get_members(
 
     return result.all()
 
+
 async def db_add_member(
     project_id: int,
     session: SessionDep,
     data: CreateMember,
     user: User
-): 
+):
 
-    db_logger.info("Add member started: project_id = %s user_id = %s",
+    db_logger.info(
+        "Add member started: project_id = %s user_id = %s",
         project_id,
         user.id
     )
 
-    stmt = select(User)\
-    .where(User.username == data.username)
+    stmt = select(User).where(User.username == data.username)
 
     user = await session.scalar(stmt)
 
-    if user is None: 
+    if user is None:
 
         db_logger.warning(
             "User not found: project_id = %s user_id = %s",
@@ -203,8 +207,7 @@ async def db_add_member(
 
         raise user_not_found()
 
-    stmt = select(ProjectMember)\
-    .where(
+    stmt = select(ProjectMember).where(
         ProjectMember.project_id == project_id,
         ProjectMember.user_id == user.id
     )
@@ -240,11 +243,12 @@ async def db_add_member(
         user.id
     )
 
+
 async def db_delete_member(
     project_id: int,
     user_id: int,
     session: SessionDep
-): 
+):
 
     db_logger.info(
         "Delete member started: project_id = %s user_id = %s",
@@ -252,8 +256,7 @@ async def db_delete_member(
         user_id
     )
 
-    stmt = delete(ProjectMember)\
-    .where(
+    stmt = delete(ProjectMember).where(
         ProjectMember.project_id == project_id,
         ProjectMember.user_id == user_id
     )
@@ -276,12 +279,13 @@ async def db_delete_member(
         user_id
     )
 
+
 async def db_change_member(
-    project_id: int, 
+    project_id: int,
     user_id: int,
     session: SessionDep,
     data: UpdateMember
-): 
+):
 
     db_logger.info(
         "Change member started: project_id = %s user_id = %s",
@@ -289,8 +293,7 @@ async def db_change_member(
         user_id
     )
 
-    stmt = select(ProjectMember)\
-    .where(
+    stmt = select(ProjectMember).where(
         ProjectMember.project_id == project_id,
         ProjectMember.user_id == user_id
     )

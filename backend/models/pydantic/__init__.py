@@ -1,6 +1,7 @@
 from .auth import (
-    Login, 
-    Register, 
+    Login,
+    Register,
+    VerifyEmail,
     ResponseAuthMe
 )
 from .users import (
@@ -11,7 +12,7 @@ from .users import (
 )
 from .projects import (
     ResponseProject,
-    CreateProject, 
+    CreateProject,
     UpdateProject
 )
 from .members import (
@@ -66,6 +67,7 @@ __all__ = [
     'UpdateBoard',
     'CreateColumn',
     'UpdateColumn',
+    'VerifyEmail',
     'CreateTask',
     'UserSchema',
     'UpdateUser',

@@ -7,13 +7,14 @@ from config import settings
 from alembic import context
 from config import Base
 from models import (
+    RegistrationCode,
     User,
     Task,
     Project,
     ProjectMember,
     Column,
     Comment,
-    Board
+    Board,
 )
 
 # this is the Alembic Config object, which provides

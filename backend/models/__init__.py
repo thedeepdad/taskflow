@@ -14,6 +14,7 @@ from .pydantic import (
     UpdateComment,
     UpdateProject,
     UpdateMember,
+    VerifyEmail,
     UpdateColumn,
     UpdateBoard,
     UpdateTask,
@@ -26,9 +27,10 @@ from .pydantic import (
     UpdateUser,
     Register,
     UpdateMe,
-    Login, 
+    Login,
 )
 from .sql import (
+    RegistrationCode,
     ProjectMember,
     Project,
     Comment,
@@ -36,7 +38,7 @@ from .sql import (
     Board,
     User,
     Task,
-) 
+)
 
 __all__ = [
     'ResponseUpdateMember',
@@ -51,12 +53,14 @@ __all__ = [
     'ResponseTask',
     'ProjectMember',
     'CreateComment',
+    'RegistrationCode',
     'ResponseUsers',
     'SchemaBoard',
     'CreateProject',
     'UpdateProject',
     'SchemaMember',
     'UpdateTask',
+    'VerifyEmail',
     'CreateColumn',
     'CreateMember',
     'UpdateMember',

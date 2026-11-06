@@ -1,10 +1,17 @@
 from pydantic import BaseModel
 
-class SchemaBoard(BaseModel): 
+
+class SchemaBoard(BaseModel):
     name: str
 
-class CreateBoard(SchemaBoard): pass
 
-class ResponseBoard(SchemaBoard): pass
+class CreateBoard(SchemaBoard):
+    pass
 
-class UpdateBoard(SchemaBoard): pass
+
+class ResponseBoard(SchemaBoard):
+    pass
+
+
+class UpdateBoard(SchemaBoard):
+    pass

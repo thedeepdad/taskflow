@@ -17,14 +17,14 @@ class Column(Base):
     board_id: Mapped[int] = mapped_column(
         ForeignKey("boards.id", ondelete='CASCADE')
     )
-    position: Mapped[int] = mapped_column(default=0)
 
-    
+    position: Mapped[int] = mapped_column(default=0)
 
     board: Mapped["Board"] = relationship(
         back_populates="columns",
         init=False
     )
+
     tasks: Mapped[list["Task"]] = relationship(
         back_populates="column",
         init=False

@@ -1,15 +1,16 @@
 from http import HTTPStatus
 import pytest
 
+
 @pytest.mark.asyncio
-async def test_columns_add_column_success(client, test_add_column): 
+async def test_columns_add_column_success(client, test_add_column):
 
     user = test_add_column['user']
     project = test_add_column['project']
 
     response_login = await client.post(
         "/auth/login",
-        data = {
+        data={
             "username": user.username,
             "password": "password123"
         }
@@ -32,26 +33,30 @@ async def test_columns_add_column_success(client, test_add_column):
 
     assert data['title'] == "In Progress"
 
+
 @pytest.mark.asyncio
-async def test_columns_add_column_unauthorized(client, test_add_column): 
+async def test_columns_add_column_unauthorized(client, test_add_column):
 
     project = test_add_column['project']
 
     response = await client.post(
         f"/projects/{project.id}/board/columns",
-        json = {
+        json={
             "title": "In Progress",
         }
     )
 
     assert response.status_code == HTTPStatus.UNAUTHORIZED
 
+
 @pytest.mark.asyncio
-async def test_columns_get_columns_success(client, test_user, test_columns_for_users, test_project): 
+async def test_columns_get_columns_success(
+    client, test_user, test_columns_for_users, test_project
+):
 
     response_login = await client.post(
         "/auth/login",
-        data = {
+        data={
             "username": test_user.username,
             "password": "password123"
         }
@@ -74,11 +79,12 @@ async def test_columns_get_columns_success(client, test_user, test_columns_for_u
     assert isinstance(data, list)
     assert len(data) == 10
 
-    for i in range(10): 
+    for i in range(10):
         assert data[i]['title'] == test_columns_for_users[i].title
 
+
 @pytest.mark.asyncio
-async def test_columns_get_columns_unauthorized(client, test_project): 
+async def test_columns_get_columns_unauthorized(client, test_project):
 
     project = test_project
 
@@ -88,12 +94,15 @@ async def test_columns_get_columns_unauthorized(client, test_project):
 
     assert response.status_code == HTTPStatus.UNAUTHORIZED
 
+
 @pytest.mark.asyncio
-async def test_columns_get_column_success(client, test_user, test_column, test_project): 
+async def test_columns_get_column_success(
+    client, test_user, test_column, test_project
+):
 
     response_login = await client.post(
         "/auth/login",
-        data = {
+        data={
             "username": test_user.username,
             "password": "password123"
         }
@@ -116,8 +125,11 @@ async def test_columns_get_column_success(client, test_user, test_column, test_p
 
     assert data['title'] == column.title
 
+
 @pytest.mark.asyncio
-async def test_columns_get_column_unauthorized(client, test_project, test_column): 
+async def test_columns_get_column_unauthorized(
+    client, test_project, test_column
+):
 
     project = test_project
     column = test_column
@@ -128,11 +140,14 @@ async def test_columns_get_column_unauthorized(client, test_project, test_column
 
     assert response.status_code == HTTPStatus.UNAUTHORIZED
 
+
 @pytest.mark.asyncio
-async def test_columns_update_column_success(client, test_user, test_project, test_column): 
+async def test_columns_update_column_success(
+    client, test_user, test_project, test_column
+):
     response_login = await client.post(
         "/auth/login",
-        data = {
+        data={
             "username": test_user.username,
             "password": "password123"
         }
@@ -147,7 +162,7 @@ async def test_columns_update_column_success(client, test_user, test_project, te
 
     response = await client.patch(
         f"/projects/{project.id}/board/columns/{column.id}",
-        json = {
+        json={
             "title": "Deleted"
         }
     )
@@ -160,26 +175,31 @@ async def test_columns_update_column_success(client, test_user, test_project, te
 
 
 @pytest.mark.asyncio
-async def test_columns_update_column_unauthorized(client, test_project, test_column): 
+async def test_columns_update_column_unauthorized(
+    client, test_project, test_column
+):
 
     project = test_project
     column = test_column
 
     response = await client.patch(
         f"/projects/{project.id}/board/columns/{column.id}",
-        json = {
+        json={
             "title": "Deleted"
         }
     )
 
     assert response.status_code == HTTPStatus.UNAUTHORIZED
 
+
 @pytest.mark.asyncio
-async def test_columns_delete_column_success(client, test_user, test_project, test_column): 
+async def test_columns_delete_column_success(
+    client, test_user, test_project, test_column
+):
 
     response_login = await client.post(
         "/auth/login",
-        data = {
+        data={
             "username": test_user.username,
             "password": "password123"
         }
@@ -192,16 +212,23 @@ async def test_columns_delete_column_success(client, test_user, test_project, te
     project = test_project
     column = test_column
 
-    response = await client.delete(f"/projects/{project.id}/board/columns/{column.id}")
+    response = await client.delete(
+        f"/projects/{project.id}/board/columns/{column.id}"
+    )
 
     assert response.status_code == HTTPStatus.NO_CONTENT
 
+
 @pytest.mark.asyncio
-async def test_columns_delete_column_unauthorized(client, test_project, test_column): 
+async def test_columns_delete_column_unauthorized(
+    client, test_project, test_column
+):
 
     project = test_project
     column = test_column
 
-    response = await client.delete(f"/projects/{project.id}/board/columns/{column.id}")
+    response = await client.delete(
+        f"/projects/{project.id}/board/columns/{column.id}"
+    )
 
     assert response.status_code == HTTPStatus.UNAUTHORIZED

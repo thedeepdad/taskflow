@@ -3,10 +3,11 @@ from datetime import datetime
 from pydantic import BaseModel
 from typing import Literal
 
-class SchemaTask(BaseModel): 
-    title: str 
+
+class SchemaTask(BaseModel):
+    title: str
     description: str | None = None
-    priority:Literal[
+    priority: Literal[
         TaskPriority.low,
         TaskPriority.medium,
         TaskPriority.high
@@ -14,14 +15,19 @@ class SchemaTask(BaseModel):
     due_date: datetime | None = None
     assignee_id: int | None = None
 
-class ResponseTask(BaseModel): 
+
+class ResponseTask(BaseModel):
     id: int
     title: str
     description: str | None = None
     assignee_id: int | None = None
-    column_id: int 
+    column_id: int
     project_id: int
 
-class CreateTask(SchemaTask): pass
 
-class UpdateTask(SchemaTask): pass
+class CreateTask(SchemaTask):
+    pass
+
+
+class UpdateTask(SchemaTask):
+    pass

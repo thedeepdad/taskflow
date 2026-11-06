@@ -18,18 +18,18 @@ from repositories import (
     db_update_me
 )
 from fastapi import (
-    APIRouter, 
-    Depends, 
+    APIRouter,
+    Depends,
     status
 )
 from dependencies import (
-    requier_role, 
+    requier_role,
     get_current_user
 )
 from config import (
-    SessionDep, 
-    UserRole, 
-    Prefix, 
+    SessionDep,
+    UserRole,
+    Prefix,
     Tags,
 )
 from typing import Annotated
@@ -42,32 +42,35 @@ router = APIRouter(
     tags=[Tags.users]
 )
 
+
 @router.get(
-    '/me', 
+    '/me',
     response_model=ResponseMe
 )
 async def get_me(
     current_user: Annotated[User, Depends(get_current_user)]
-): 
+):
 
-    logger.info("User requested their profile: user_id = %s",
+    logger.info(
+        "User requested their profile: user_id = %s",
         current_user.id
     )
-    
+
     return current_user
+
 
 @router.patch('/me', response_model=ResponseMe)
 async def update_me(
     data: UpdateMe,
     session: SessionDep,
     current_user: Annotated[User, Depends(get_current_user)]
-):  
+):
 
     logger.info(
         "User update: user_id = %s",
         current_user.id
     )
-    
+
     user = await db_update_me(
         data,
         session,
@@ -81,16 +84,18 @@ async def update_me(
 
     return user
 
+
 @router.delete(
-    '/me', 
+    '/me',
     status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_me(
     session: SessionDep,
     current_user: Annotated[User, Depends(get_current_user)]
-) -> None: 
+) -> None:
 
-    logging.info("User delete: user_id = %s",
+    logging.info(
+        "User delete: user_id = %s",
         current_user.id
     )
 
@@ -99,26 +104,26 @@ async def delete_me(
         current_user
     )
 
-    logger.info("User deleted: user_id = %s",
+    logger.info(
+        "User deleted: user_id = %s",
         current_user.id
     )
-
 
 
 @router.get(
     '/me/projects',
     response_model=list[ResponseProject]
-)      
+)
 async def get_projects(
     session: SessionDep,
     current_user: Annotated[User, Depends(get_current_user)]
-) -> list[ResponseProject]: 
-        
+) -> list[ResponseProject]:
+
     logger.info(
         "Get projects: user_id = %s",
         current_user.id
-    )   
-    
+    )
+
     projects = await db_get_projects_me(
         session,
         current_user
@@ -132,6 +137,7 @@ async def get_projects(
 
     return projects
 
+
 @router.get(
     '/me/tasks',
     response_model=list[ResponseTask]
@@ -139,7 +145,7 @@ async def get_projects(
 async def get_tasks(
     session: SessionDep,
     current_user: Annotated[User, Depends(get_current_user)]
-) -> list[ResponseTask]: 
+) -> list[ResponseTask]:
 
     logger.info(
         "Get tasks: user_id = %s",
@@ -167,7 +173,7 @@ async def get_tasks(
 async def get_users(
     session: SessionDep,
     current_user: Annotated[User, Depends(requier_role(UserRole.admin))]
-) -> list[UserSchema]: 
+) -> list[UserSchema]:
 
     logger.info(
         "Get users: user_id = %s",
@@ -184,6 +190,7 @@ async def get_users(
 
     return users
 
+
 @router.get(
     '/{user_id}',
     response_model=UserSchema
@@ -192,8 +199,8 @@ async def get_user(
     user_id: int,
     session: SessionDep,
     current_user: Annotated[User, Depends(requier_role(UserRole.admin))]
-) -> User: 
-    
+) -> User:
+
     logger.info(
         "Get user: member_id = %s by_user_id = %s",
         user_id,
@@ -210,16 +217,17 @@ async def get_user(
 
     return user
 
+
 @router.patch(
     '/{user_id}',
     response_model=UserSchema
 )
 async def update_user(
-    user_id: int, 
+    user_id: int,
     session: SessionDep,
     data: UpdateUser,
     current_user: Annotated[User, Depends(requier_role(UserRole.admin))],
-) -> User: 
+) -> User:
 
     logger.info(
         "Update user: member_id = %s user_id = %s",
@@ -237,7 +245,8 @@ async def update_user(
         "User updated: member_id = %s user_id = %s"
     )
 
-    return user  
+    return user
+
 
 @router.delete(
     '/{user_id}',

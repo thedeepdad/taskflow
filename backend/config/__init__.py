@@ -9,13 +9,13 @@ from .enum import (
 )
 
 __all__ = [
-    'SessionDep', 
-    'Base', 
-    'MemberRole', 
-    'UserRole',
-    'Prefix',
-    'Tags',
-    'settings',
+    'setup_logging',
     'TaskPriority',
-    'setup_logging'    
+    'MemberRole',
+    'SessionDep',
+    'UserRole',
+    'settings',
+    'Prefix',
+    'Base',
+    'Tags',
 ]

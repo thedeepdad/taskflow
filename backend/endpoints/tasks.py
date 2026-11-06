@@ -1,29 +1,29 @@
 from config import (
-    SessionDep, 
-    Prefix, 
+    SessionDep,
+    Prefix,
     Tags
 )
 from models import (
     UpdateTask,
     ResponseTask,
-    CreateTask, 
+    CreateTask,
     User,
     Task
 )
 from fastapi import (
     status,
-    APIRouter, 
+    APIRouter,
     Depends
 )
 from repositories import (
     db_delete_task,
     db_update_task,
-    db_add_task, 
+    db_add_task,
     db_get_tasks,
     db_get_task
 )
 from dependencies import (
-    requier_project_member, 
+    requier_project_member,
     requier_project_manager
 )
 from typing import Annotated
@@ -32,9 +32,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
-    prefix=Prefix.tasks, 
+    prefix=Prefix.tasks,
     tags=[Tags.tasks]
 )
+
 
 @router.post(
     '',
@@ -53,9 +54,9 @@ async def add_tasks(
         "Create task started: project_id = %s column_id = %s user_id = %s",
         project_id,
         column_id,
-        current_user.id 
+        current_user.id
     )
-     
+
     task = await db_add_task(
         project_id,
         column_id,
@@ -65,7 +66,8 @@ async def add_tasks(
     )
 
     logger.info(
-        "Task created: project_id = %s column_id = %s task_id = %s user_id = %s",
+        "Task created: project_id = %s column_id = %s "
+        "task_id = %s user_id = %s",
         project_id,
         column_id,
         task.id,
@@ -73,6 +75,7 @@ async def add_tasks(
     )
 
     return task
+
 
 @router.get(
     '',
@@ -91,7 +94,7 @@ async def get_tasks(
         column_id,
         current_user.id
     )
-     
+
     tasks = await db_get_tasks(
         project_id,
         column_id,
@@ -99,7 +102,8 @@ async def get_tasks(
     )
 
     logger.info(
-        "Tasks retrieved: project_id = %s column_id = %s count = %s user_id = %s",
+        "Tasks retrieved: project_id = %s column_id = %s "
+        "count = %s user_id = %s",
         project_id,
         column_id,
         len(tasks),
@@ -107,6 +111,7 @@ async def get_tasks(
     )
 
     return tasks
+
 
 @router.get(
     '/{task_id}',
@@ -121,13 +126,14 @@ async def get_task(
 ) -> Task:
 
     logger.info(
-        "Get task started: project_id = %s column_id = %s task_id = %s user_id = %s",
+        "Get task started: project_id = %s column_id = %s "
+        "task_id = %s user_id = %s",
         project_id,
         column_id,
         task_id,
         current_user.id
     )
-     
+
     task = await db_get_task(
         project_id,
         column_id,
@@ -136,7 +142,8 @@ async def get_task(
     )
 
     logger.info(
-        "Task retrieved: project_id = %s column_id = %s task_id = %s user_id = %s",
+        "Task retrieved: project_id = %s column_id = %s "
+        "task_id = %s user_id = %s",
         project_id,
         column_id,
         task_id,
@@ -144,6 +151,7 @@ async def get_task(
     )
 
     return task
+
 
 @router.patch(
     '/{task_id}',
@@ -156,16 +164,17 @@ async def change_task(
     data: UpdateTask,
     session: SessionDep,
     current_user: Annotated[User, Depends(requier_project_member)]
-): 
+):
 
     logger.info(
-        "Change task started: project_id = %s column_id = %s task_id = %s user_id = %s",
+        "Change task started: project_id = %s column_id = %s "
+        "task_id = %s user_id = %s",
         project_id,
         column_id,
         task_id,
         current_user.id
     )
-    
+
     task = await db_update_task(
         project_id,
         column_id,
@@ -175,7 +184,8 @@ async def change_task(
     )
 
     logger.info(
-        "Task changed: project_id = %s column_id = %s task_id = %s user_id = %s",
+        "Task changed: project_id = %s column_id = %s "
+        "task_id = %s user_id = %s",
         project_id,
         column_id,
         task_id,
@@ -183,6 +193,7 @@ async def change_task(
     )
 
     return task
+
 
 @router.delete(
     '/{task_id}',
@@ -194,16 +205,17 @@ async def delete_task(
     task_id: int,
     session: SessionDep,
     current_user: Annotated[User, Depends(requier_project_manager)]
-): 
+):
 
     logger.info(
-        "Delete task started: project_id = %s column_id = %s task_id = %s user_id = %s",
+        "Delete task started: project_id = %s column_id = %s "
+        "task_id = %s user_id = %s",
         project_id,
         column_id,
         task_id,
         current_user.id
     )
-    
+
     await db_delete_task(
         project_id,
         column_id,
@@ -212,7 +224,8 @@ async def delete_task(
     )
 
     logger.info(
-        "Delete task: project_id = %s column_id = %s task_id = %s user_id = %s",
+        "Delete task: project_id = %s column_id = %s "
+        "task_id = %s user_id = %s",
         project_id,
         column_id,
         task_id,

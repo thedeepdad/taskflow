@@ -1,7 +1,7 @@
 from models import (
-    CreateColumn, 
+    CreateColumn,
     UpdateColumn,
-    Column, 
+    Column,
 )
 from exceptions.http import column_not_found
 from .common import execute_commit, requier_board, execute_scalars
@@ -11,22 +11,23 @@ import logging
 
 logger = logging.getLogger('database')
 
+
 async def db_add_column(
     project_id: int,
     session: SessionDep,
     data: CreateColumn
-): 
+):
 
     logger.debug(
         "Create column started: project_id = %s",
         project_id
     )
-    
+
     board = await requier_board(project_id, session)
 
     column = Column(
         title=data.title,
-        board_id=board.id    
+        board_id=board.id
     )
 
     session.add(column)
@@ -42,10 +43,11 @@ async def db_add_column(
 
     return column
 
+
 async def db_get_columns(
     project_id: int,
     session: SessionDep
-): 
+):
 
     logger.debug(
         "Get columns started: project_id = %s",
@@ -53,9 +55,8 @@ async def db_get_columns(
     )
 
     board = await requier_board(project_id, session)
-    
-    stmt = select(Column)\
-    .where(Column.board_id == board.id)
+
+    stmt = select(Column).where(Column.board_id == board.id)
 
     columns = await execute_scalars(session, stmt)
 
@@ -66,23 +67,23 @@ async def db_get_columns(
 
     return columns.all()
 
+
 async def db_get_column(
     project_id: int,
     column_id: int,
     session: SessionDep
-): 
+):
 
     logger.info(
         "Get column started: project_id = %s column_id = %s",
         project_id,
         column_id
     )
-    
+
     board = await requier_board(project_id, session)
 
-    stmt = select(Column)\
-    .where(
-        Column.board_id == board.id, 
+    stmt = select(Column).where(
+        Column.board_id == board.id,
         Column.id == column_id
     )
 
@@ -106,25 +107,23 @@ async def db_get_column(
 
     return column
 
+
 async def db_update_column(
     project_id: int,
     column_id: int,
     session: SessionDep,
     data: UpdateColumn
-): 
+):
 
     logger.info(
         "Update column started: project_id = %s column_id = %s",
         project_id,
         column_id
     )
-    
+
     await requier_board(project_id, session)
 
-    stmt = select(Column)\
-    .where(
-        Column.id == column_id
-    )
+    stmt = select(Column).where(Column.id == column_id)
 
     column = await session.scalar(stmt)
 
@@ -148,9 +147,10 @@ async def db_update_column(
         "Column updated: project_id = %s column_id = %s",
         project_id,
         column_id
-    )   
+    )
 
     return column
+
 
 async def db_delete_column(
     project_id: int,
@@ -161,15 +161,12 @@ async def db_delete_column(
     logger.info(
         "Delete column: project_id = %s column_id = %s",
         project_id,
-        column_id   
+        column_id
     )
 
     await requier_board(project_id, session)
 
-    stmt = delete(Column)\
-    .where(
-        Column.id == column_id
-    )
+    stmt = delete(Column).where(Column.id == column_id)
 
     result = await session.execute(stmt)
     await execute_commit(session)
@@ -183,7 +180,6 @@ async def db_delete_column(
         )
 
         raise column_not_found()
-
 
     logger.info(
         "Column deleted: project_id = %s column_id = %s",

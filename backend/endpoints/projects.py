@@ -16,13 +16,13 @@ from repositories import (
     db_get_projects,
     db_get_members,
     db_get_project,
-    db_add_project, 
+    db_add_project,
     db_add_member
 )
 from dependencies import (
-    requier_project_manager, 
+    requier_project_manager,
     requier_project_member,
-    get_current_user, 
+    get_current_user,
 )
 from config import SessionDep, Tags, Prefix
 from fastapi import APIRouter, Depends, status
@@ -32,15 +32,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
-    prefix=Prefix.projects, 
+    prefix=Prefix.projects,
     tags=[Tags.projects]
 )
+
 
 @router.post(
     '',
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseProject
-)    
+)
 async def add_project(
     data: CreateProject,
     session: SessionDep,
@@ -56,8 +57,8 @@ async def add_project(
         data,
         session,
         current_user
-    )   
-    
+    )
+
     logger.info(
         "Project created: project_id = %s, user_id = %s",
         project.id,
@@ -66,6 +67,7 @@ async def add_project(
 
     return project
 
+
 @router.get(
     '',
     response_model=list[ResponseProject]
@@ -73,13 +75,13 @@ async def add_project(
 async def get_projects(
     session: SessionDep,
     current_user: Annotated[User, Depends(get_current_user)]
-) -> list[ResponseProject]: 
+) -> list[ResponseProject]:
 
     logger.info(
         "Get projects: user_id = %s",
         current_user.id
     )
-    
+
     projects = await db_get_projects(session)
 
     logger.info(
@@ -90,24 +92,25 @@ async def get_projects(
 
     return projects
 
+
 @router.get(
-    '/{project_id}', 
+    '/{project_id}',
     response_model=ResponseProject
 )
 async def get_project(
     project_id: int,
     session: SessionDep,
     current_user: Annotated[
-        User, 
+        User,
         Depends(requier_project_member)
     ]
-) -> ResponseProject: 
+) -> ResponseProject:
 
     logger.info(
-        "Get proeject: user_id = %s", 
+        "Get proeject: user_id = %s",
         current_user.id
     )
-    
+
     project = await db_get_project(
         project_id,
         session
@@ -119,18 +122,19 @@ async def get_project(
         current_user.id
     )
 
-    return project 
+    return project
+
 
 @router.patch(
     '/{project_id}',
     response_model=ResponseProject
 )
 async def update_project(
-    project_id: int, 
+    project_id: int,
     data: UpdateProject,
     session: SessionDep,
     current_user: Annotated[User, Depends(requier_project_manager)]
-) -> ResponseProject: 
+) -> ResponseProject:
 
     logger.info(
         "Update project: user_id = %s",
@@ -138,8 +142,8 @@ async def update_project(
     )
 
     project = await db_update_project(
-        project_id, 
-        data, 
+        project_id,
+        data,
         session
     )
 
@@ -151,7 +155,6 @@ async def update_project(
 
     return project
 
-   
 
 @router.delete(
     '/{project_id}',
@@ -161,15 +164,15 @@ async def delete_project(
     project_id: int,
     session: SessionDep,
     current_user: Annotated[User, Depends(requier_project_manager)]
-) -> None: 
+) -> None:
 
     logger.info(
         "Delete project: user_id = %s",
         current_user.id
     )
-    
+
     await db_delete_project(
-        project_id, 
+        project_id,
         session
     )
 
@@ -188,25 +191,27 @@ async def get_members(
     project_id: int,
     session: SessionDep,
     current_user: Annotated[User, Depends(requier_project_member)]
-) -> list[ResponseMembers]: 
+) -> list[ResponseMembers]:
 
-    logger.info("Get members in project: project_id = %s user_id = %s",
+    logger.info(
+        "Get members in project: project_id = %s user_id = %s",
         project_id,
         current_user.id
     )
-    
+
     result = await db_get_members(
         project_id,
         session,
     )
 
-    logger.info("Members retrieved: project_id = %s user_id = %s",
+    logger.info(
+        "Members retrieved: project_id = %s user_id = %s",
         project_id,
         current_user.id
     )
 
     return result
-    
+
 
 @router.post(
     '/{project_id}/members',
@@ -217,13 +222,14 @@ async def add_members(
     session: SessionDep,
     data: CreateMember,
     current_user: Annotated[User, Depends(requier_project_manager)]
-) -> dict[str, str]: 
+) -> dict[str, str]:
 
-    logger.info("Add member started: project_id = %s user_id = %s",
-        project_id, 
+    logger.info(
+        "Add member started: project_id = %s user_id = %s",
+        project_id,
         current_user.id
     )
-    
+
     await db_add_member(
         project_id,
         session,
@@ -231,7 +237,8 @@ async def add_members(
         current_user
     )
 
-    logger.info("Member added: project_id = %s user_id = %s",
+    logger.info(
+        "Member added: project_id = %s user_id = %s",
         project_id,
         current_user.id
     )
@@ -240,19 +247,21 @@ async def add_members(
         'message': 'user added'
     }
 
+
 @router.patch(
     '/{project_id}/members/{user_id}',
     response_model=ResponseUpdateMember
 )
 async def change_member(
     project_id: int,
-    user_id: int,   
+    user_id: int,
     session: SessionDep,
     data: UpdateMember,
     current_user: Annotated[User, Depends(requier_project_manager)]
-): 
+):
 
-    logger.info("Change member: project_id = %s member_id = %s by_user_id = %s",
+    logger.info(
+        "Change member: project_id = %s member_id = %s by_user_id = %s",
         project_id,
         user_id,
         current_user.id
@@ -265,13 +274,15 @@ async def change_member(
         data
     )
 
-    logger.info("Member changed: project_id = %s member_id = %s by_user_id = %s",
+    logger.info(
+        "Member changed: project_id = %s member_id = %s by_user_id = %s",
         project_id,
         user_id,
         current_user.id
     )
 
     return member
+
 
 @router.delete(
     '/{project_id}/members/{user_id}',
@@ -282,15 +293,15 @@ async def delete_member(
     user_id: int,
     session: SessionDep,
     current_user: Annotated[User, Depends(requier_project_manager)]
-) -> None: 
+) -> None:
 
     logger.info(
-        "Delete member: project_id = %s member_id = %s by_user_id = %s", 
+        "Delete member: project_id = %s member_id = %s by_user_id = %s",
         project_id,
         user_id,
         current_user.id
     )
-    
+
     await db_delete_member(
         project_id,
         user_id,
@@ -300,6 +311,6 @@ async def delete_member(
     logger.info(
         "Member deleted: project_id = %s member_id = %s by_user_id = %s",
         project_id,
-        user_id,   
+        user_id,
         current_user.id
     )

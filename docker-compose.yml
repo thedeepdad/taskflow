@@ -1,3 +1,4 @@
+
 services:
   backend:
     build: ./backend
@@ -10,6 +11,19 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      rabbit:
+        condition: service_started
+    restart: unless-stopped
+
+  worker:
+    build: ./backend
+    entrypoint: ["uv", "run", "python", "-m", "worker.email_worker"]
+    env_file:
+      - .env
+    depends_on:
+      rabbit:
+        condition: service_started
+    restart: unless-stopped
 
   postgres:
     image: postgres:18
@@ -29,5 +43,18 @@ services:
       timeout: 5s
       retries: 5
 
+  rabbit:
+    image: rabbitmq:4-management-alpine
+    container_name: rabbit
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBIT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASSWORD}
+    ports:
+      - "${RABBIT_PORT}:5672"
+      - "${RABBIT_PORT_GUI}:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
 volumes:
   postgres_data:
+  rabbitmq_data:

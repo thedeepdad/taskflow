@@ -4,7 +4,8 @@ from .tasks import Task
 from .board import Board
 from .column import Column
 from .comments import Comment
-from .projects_member import  ProjectMember
+from .projects_member import ProjectMember
+from .registrations_codes import RegistrationCode
 
 
 __all__ = [
@@ -14,5 +15,6 @@ __all__ = [
     'Board',
     'Column',
     'Comment',
-    'ProjectMember'
+    'ProjectMember',
+    'RegistrationCode'
 ]

@@ -3,10 +3,11 @@ from typing import Any
 from jwt import encode, decode
 from config import settings
 
+
 def encode_token(
-    payload: dict[str, Any], 
+    payload: dict[str, Any],
     refresh: bool = False
-) -> str: 
+) -> str:
 
     if refresh:
         exp = timedelta(days=settings.refresh_token_exp)
@@ -14,7 +15,6 @@ def encode_token(
     else:
         exp = timedelta(minutes=settings.access_token_exp)
         token_type = 'access'
-
 
     time_now = datetime.now(timezone.utc)
     payload_update = {
@@ -33,7 +33,8 @@ def encode_token(
 
     return token
 
-def decode_token(token: str | bytes) -> dict[str, Any]: 
+
+def decode_token(token: str | bytes) -> dict[str, Any]:
 
     payload = decode(
         jwt=token,
@@ -42,4 +43,3 @@ def decode_token(token: str | bytes) -> dict[str, Any]:
     )
 
     return payload
-

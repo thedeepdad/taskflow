@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>TaskFlow - Подтверждение email</title>
+</head>
+<body>
+
+    <h1>Подтверждение регистрации</h1>
+
+    <p id="email-message"></p>
+
+    <form id="verify-form">
+        <input
+            type="text"
+            name="code"
+            placeholder="Введите код из email"
+            maxlength="6"
+            pattern="[0-9]{6}"
+            required
+        >
+
+        <button type="submit">Подтвердить</button>
+    </form>
+
+    <p id="message"></p>
+
+    <script src="./verify.js"></script>
+
+</body>
+</html>

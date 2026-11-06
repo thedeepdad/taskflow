@@ -11,15 +11,14 @@ from models import (
     Board,
     Comment,
 )
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from config import UserRole, TaskPriority, settings
 from httpx import ASGITransport, AsyncClient
 from config.database import get_session
 from sqlalchemy import NullPool, text
 from security import hash_password
-from pathlib import Path
 import pytest_asyncio
 from main import app
+
 
 @pytest_asyncio.fixture
 async def session():
@@ -68,6 +67,7 @@ async def session():
 
     await test_engine.dispose()
 
+
 @pytest_asyncio.fixture
 async def client(session):
 
@@ -101,9 +101,8 @@ async def test_user(session):
     yield user
 
 
-
 @pytest_asyncio.fixture
-async def test_user_without_delete(session): 
+async def test_user_without_delete(session):
     user = User(
         username="test_user",
         email="test_user@gmail.com",
@@ -116,11 +115,12 @@ async def test_user_without_delete(session):
 
     return user
 
+
 @pytest_asyncio.fixture
-async def test_proejcts_for_user(session, test_user): 
+async def test_proejcts_for_user(session, test_user):
     projects = []
 
-    for i in range(10): 
+    for i in range(10):
         project = Project(
             name=f"project_{i}",
             description=None,
@@ -142,7 +142,6 @@ async def test_proejcts_for_user(session, test_user):
     await session.commit()
 
     yield projects
-
 
 
 @pytest_asyncio.fixture
@@ -169,7 +168,6 @@ async def test_project(session, test_user):
     yield project
 
 
-
 @pytest_asyncio.fixture
 async def test_board(session, test_project):
     board = Board(
@@ -178,15 +176,14 @@ async def test_board(session, test_project):
     )
 
     session.add(board)
-    await session.commit()  
+    await session.commit()
     await session.refresh(board)
 
     yield board
 
 
-
 @pytest_asyncio.fixture
-async def test_column(session, test_board): 
+async def test_column(session, test_board):
     column = Column(
         title="TestColumn",
         board_id=test_board.id
@@ -197,8 +194,6 @@ async def test_column(session, test_board):
     await session.refresh(column)
 
     yield column
-
-
 
 
 @pytest_asyncio.fixture
@@ -221,9 +216,8 @@ async def test_task(session, test_project, test_column, test_user):
     yield task
 
 
-
 @pytest_asyncio.fixture
-async def test_tasks_for_user(session, test_project, test_column, test_user): 
+async def test_tasks_for_user(session, test_project, test_column, test_user):
 
     tasks = []
 
@@ -249,8 +243,6 @@ async def test_tasks_for_user(session, test_project, test_column, test_user):
     yield tasks
 
 
-
-
 @pytest_asyncio.fixture
 async def test_admin(session):
     admin = User(
@@ -265,7 +257,6 @@ async def test_admin(session):
     await session.refresh(admin)
 
     yield admin
-
 
 
 @pytest_asyncio.fixture
@@ -301,10 +292,10 @@ async def test_member(session):
 
 
 @pytest_asyncio.fixture
-async def test_users_for_user(session): 
+async def test_users_for_user(session):
     users = []
 
-    for i in range(10): 
+    for i in range(10):
         user = User(
             username=f"User_{i}",
             email=f"user_{i}@gmail.com",
@@ -322,7 +313,7 @@ async def test_users_for_user(session):
 
 
 @pytest_asyncio.fixture
-async def test_add_project(session): 
+async def test_add_project(session):
     user = User(
         username="testproject",
         email="testproject@gmail.com",
@@ -336,9 +327,8 @@ async def test_add_project(session):
     yield user
 
 
-
 @pytest_asyncio.fixture
-async def test_add_board(session): 
+async def test_add_board(session):
     user = User(
         username="testboard",
         email="testboard@gmail.com",
@@ -374,7 +364,6 @@ async def test_add_board(session):
         "user": user,
         "project": project
     }
-
 
 
 @pytest_asyncio.fixture
@@ -448,7 +437,7 @@ async def test_columns_for_users(session, test_board):
 
 
 @pytest_asyncio.fixture
-async def test_add_task(session): 
+async def test_add_task(session):
     user = User(
         username="testtask",
         email="testtask@gmail.com",
@@ -501,8 +490,9 @@ async def test_add_task(session):
         "column": column
     }
 
+
 @pytest_asyncio.fixture
-async def test_add_comment(session): 
+async def test_add_comment(session):
     user = User(
         username="testtask",
         email="testtask@gmail.com",
@@ -569,6 +559,7 @@ async def test_add_comment(session):
         "task": task
     }
 
+
 @pytest_asyncio.fixture
 async def test_comment(session, test_user, test_task):
 
@@ -584,8 +575,9 @@ async def test_comment(session, test_user, test_task):
 
     yield comment
 
+
 @pytest_asyncio.fixture
-async def test_comments_for_user(session, test_user, test_task): 
+async def test_comments_for_user(session, test_user, test_task):
 
     comments = []
 
@@ -605,4 +597,3 @@ async def test_comments_for_user(session, test_user, test_task):
     await session.commit()
 
     yield comments
-    

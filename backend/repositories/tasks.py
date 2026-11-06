@@ -3,7 +3,7 @@ from models import (
     UpdateTask,
     CreateTask,
     User,
-    Task, 
+    Task,
 )
 from exceptions.http import assignee_not_found
 from .common import validation_task, execute_commit
@@ -13,13 +13,14 @@ import logging
 
 db_logger = logging.getLogger('database')
 
+
 async def db_add_task(
     project_id: int,
     column_id: int,
     session: SessionDep,
     data: CreateTask,
     user: User
-): 
+):
 
     db_logger.info(
         "Create task: project_id = %s column_id = %s user_id = %s",
@@ -60,7 +61,7 @@ async def db_add_task(
 
     session.add(task)
 
-    await execute_commit(session)  
+    await execute_commit(session)
     await session.refresh(task)
 
     db_logger.info(
@@ -71,6 +72,7 @@ async def db_add_task(
     )
 
     return task
+
 
 async def db_get_tasks(
     project_id: int,
@@ -90,8 +92,7 @@ async def db_get_tasks(
         session
     )
 
-    stmt = select(Task)\
-    .where(Task.column_id == column_id)
+    stmt = select(Task).where(Task.column_id == column_id)
 
     tasks = await session.scalars(stmt)
 
@@ -103,12 +104,13 @@ async def db_get_tasks(
 
     return tasks.all()
 
+
 async def db_get_task(
     project_id: int,
     column_id: int,
     task_id: int,
     session: SessionDep,
-) -> Task: 
+) -> Task:
 
     db_logger.info(
         "Get task: project_id = %s column_id = %s task_id = %s",
@@ -116,15 +118,14 @@ async def db_get_task(
         column_id,
         task_id
     )
-    
+
     await validation_task(
         project_id,
         column_id,
         session
     )
 
-    stmt = select(Task)\
-    .where(Task.id == task_id)
+    stmt = select(Task).where(Task.id == task_id)
 
     task = await session.scalar(stmt)
 
@@ -148,13 +149,14 @@ async def db_get_task(
 
     return task
 
+
 async def db_update_task(
     project_id: int,
     column_id: int,
     task_id: int,
     data: UpdateTask,
-    session: SessionDep,            
-): 
+    session: SessionDep,
+):
 
     db_logger.info(
         "Update task: project_id = %s column_id = %s task_id = %s",
@@ -193,13 +195,14 @@ async def db_update_task(
         if user is None:
 
             db_logger.warning(
-                "Assignee not found: project_id = %s column_id = %s task_id = %s",
+                "Assignee not found: project_id = %s column_id = %s "
+                "task_id = %s",
                 project_id,
                 column_id,
                 task_id
             )
 
-            raise assignee_not_found() 
+            raise assignee_not_found()
 
     await execute_commit(session)
     await session.refresh(task)
@@ -213,12 +216,13 @@ async def db_update_task(
 
     return task
 
+
 async def db_delete_task(
     project_id: int,
     column_id: int,
     task_id: int,
-    session: SessionDep        
-): 
+    session: SessionDep
+):
 
     db_logger.info(
         "Delete task: project_id = %s column_id = %s task_id = %s",
@@ -226,15 +230,14 @@ async def db_delete_task(
         column_id,
         task_id
     )
-    
+
     await validation_task(
         project_id,
         column_id,
         session
-    )    
+    )
 
-    stmt = delete(Task)\
-    .where(Task.id == task_id)
+    stmt = delete(Task).where(Task.id == task_id)
 
     result = await session.execute(stmt)
     await execute_commit(session)

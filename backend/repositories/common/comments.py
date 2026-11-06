@@ -1,7 +1,7 @@
 from models import (
-    Project, 
-    Board, 
-    Column, 
+    Project,
+    Board,
+    Column,
     Task
 )
 from config import SessionDep
@@ -11,19 +11,22 @@ import logging
 
 logger = logging.getLogger('database')
 
+
 async def validation_comment(
     project_id: int,
     column_id: int,
     task_id: int,
-    session: SessionDep,     
+    session: SessionDep,
 ):
 
-    logger.debug("Validation comment started: project_id = %s column_id = %s task_id = %s",
+    logger.debug(
+        "Validation comment started: project_id = %s "
+        "column_id = %s task_id = %s",
         project_id,
         column_id,
         task_id
     )
-    
+
     project = await session.get(Project, project_id)
 
     if project is None:
@@ -40,12 +43,11 @@ async def validation_comment(
             detail='Project not found'
         )
 
-    stmt = select(Board)\
-    .where(Board.project_id == project_id)
+    stmt = select(Board).where(Board.project_id == project_id)
 
     board = await session.scalar(stmt)
 
-    if board is None: 
+    if board is None:
 
         logger.warning(
             "Board not found: project_id = %s column_id = %s task_id = %s",
@@ -59,8 +61,7 @@ async def validation_comment(
             detail='Board not found'
         )
 
-    stmt = select(Column)\
-    .where(
+    stmt = select(Column).where(
         Column.id == column_id,
         Column.board_id == board.id
     )
@@ -81,8 +82,7 @@ async def validation_comment(
             detail='Column not found'
         )
 
-    stmt = select(Task)\
-    .where(
+    stmt = select(Task).where(
         Task.id == task_id,
         Task.column_id == column_id
     )
@@ -104,7 +104,8 @@ async def validation_comment(
         )
 
     logger.debug(
-        "Validation comment successfuly: project_id = %s column_id = %s task_id = %s",
+        "Validation comment successfuly: project_id = %s "
+        "column_id = %s task_id = %s",
         project_id,
         column_id,
         task_id
