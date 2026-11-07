@@ -22,4 +22,8 @@ fi
 
 uv run alembic upgrade head
 
-exec uv run --no-dev uvicorn main:app --host 0.0.0.0 --port 8000
+exec uv run --no-dev granian \
+--interface asgi \
+main:app \
+--host 0.0.0.0 \
+--port 8000

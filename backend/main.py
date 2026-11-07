@@ -3,8 +3,9 @@ from config import settings, setup_logging
 from endpoints import router
 from fastapi import FastAPI
 from rabbit.lifespan import lifespan
+from granian import Granian
+from granian.constants import Interfaces
 import logging
-import uvicorn
 
 setup_logging()
 
@@ -32,4 +33,13 @@ logger = logging.getLogger(__name__)
 logger.info('Application started')
 
 if __name__ == '__main__':
-    uvicorn.run('main:app', reload=True, host=settings.localhost)
+    server = Granian(
+        target="main:app",
+        address=settings.localhost,
+        port=8000,
+        interface=Interfaces.ASGI,
+        workers=1,
+        reload=True
+    )
+
+    server.serve()
