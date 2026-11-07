@@ -31,6 +31,15 @@ class RegistrationCode(Base):
         onupdate=func.now(),
         init=False
     )
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False
+    )
+    attempts: Mapped[int] = mapped_column(
+        default=0,
+        server_default="0",
+        nullable=False
+    )
     user: Mapped["User"] = relationship(
         back_populates="registration_code",
         init=False

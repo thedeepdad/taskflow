@@ -6,11 +6,12 @@ from exceptions.http import (
 from models import Register, User, Login, RegistrationCode, VerifyEmail
 from sqlalchemy.exc import IntegrityError, OperationalError
 from security import generate_verification_code, hash_code, verify_code
-from rabbit.publisher import publish_email
-from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import timedelta, datetime, timezone
 from fastapi import HTTPException, status, Request
-from sqlalchemy import select, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+from rabbit.publisher import publish_email
 from .common import execute_commit
+from sqlalchemy import select
 from typing import Any
 import logging
 
@@ -39,9 +40,11 @@ async def add_user(
         await session.flush()
 
         code = generate_verification_code()
+
         registration_code = RegistrationCode(
             user_id=user.id,
-            hash_code=hash_code(code)
+            hash_code=hash_code(code),
+            expires_at=datetime.now(timezone.utc) + timedelta(minutes=10),
         )
 
         session.add(registration_code)
@@ -135,15 +138,34 @@ async def db_verify_email(
     if registration_code is None:
         raise registration_not_found()
 
-    if not verify_code(data.code, registration_code.hash_code):
+    if datetime.now(timezone.utc) >= registration_code.expires_at:
+        await session.delete(registration_code)
+        await session.commit()
 
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Registration code expired"
+        )
+
+    if registration_code.attempts >= 5:
+        await session.delete(registration_code)
+        await session.commit()
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Too many attempts"
+        )
+
+    if not verify_code(data.code, registration_code.hash_code):
+        registration_code.attempts += 1
+        await session.commit()
         db_logger.warning(
             "Verify code invalid"
         )
 
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Verify code invalid"
+            detail="Registration code invalid"
         )
 
     await session.delete(registration_code)
