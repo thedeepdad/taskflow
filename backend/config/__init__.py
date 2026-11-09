@@ -7,10 +7,12 @@ from .enum import (
     Prefix,
     Tags,
 )
+from .decorators import log_execute
 
 __all__ = [
     'setup_logging',
     'TaskPriority',
+    'log_execute',
     'MemberRole',
     'SessionDep',
     'UserRole',

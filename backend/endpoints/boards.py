@@ -1,4 +1,5 @@
 from config import (
+    log_execute,
     SessionDep,
     Prefix,
     Tags,
@@ -36,6 +37,7 @@ router = APIRouter(
 )
 
 
+@log_execute
 @router.post(
     '',
     response_model=ResponseBoard,
@@ -48,12 +50,6 @@ async def add_board(
     current_user: Annotated[User, Depends(requier_project_manager)]
 ):
 
-    logger.info(
-        "Create board: project_id = %s user_id = %s",
-        project_id,
-        current_user.id
-    )
-
     board = await db_add_board(
         project_id,
         data,
@@ -61,16 +57,10 @@ async def add_board(
         current_user
     )
 
-    logger.info(
-        "Board created: project_id = %s board_id = %s user_id = %s",
-        project_id,
-        board.id,
-        current_user.id
-    )
-
     return board
 
 
+@log_execute
 @router.get(
     '',
     response_model=ResponseBoard
@@ -78,29 +68,18 @@ async def add_board(
 async def get_board(
     project_id: int,
     session: SessionDep,
-    current_user: Annotated[User, Depends(requier_project_member)]
+    _: Annotated[User, Depends(requier_project_member)]
 ):
-    logger.info(
-        "Get board: project_id = %s user_id = %s",
-        project_id,
-        current_user.id
-    )
 
     board = await db_get_board(
         project_id,
         session
     )
 
-    logger.info(
-        "Board retrieved: project_id = %s board_id = %s user_id = %s",
-        project_id,
-        board.id,
-        current_user.id
-    )
-
     return board
 
 
+@log_execute
 @router.patch(
     '',
     response_model=ResponseBoard
@@ -109,14 +88,8 @@ async def update_board(
     project_id: int,
     session: SessionDep,
     data: UpdateBoard,
-    current_user: Annotated[User, Depends(requier_project_manager)]
+    _: Annotated[User, Depends(requier_project_manager)]
 ):
-
-    logger.info(
-        "Update board: project_id = %s user_id = %s",
-        project_id,
-        current_user.id
-    )
 
     board = await db_update_board(
         project_id,
@@ -124,16 +97,10 @@ async def update_board(
         data
     )
 
-    logger.info(
-        "Board updated: project_id = %s board_id = %s user_id = %s",
-        project_id,
-        board.id,
-        current_user.id
-    )
-
     return board
 
 
+@log_execute
 @router.delete(
     '',
     status_code=status.HTTP_204_NO_CONTENT
@@ -141,22 +108,10 @@ async def update_board(
 async def delete_board(
     project_id: int,
     session: SessionDep,
-    current_user: Annotated[User, Depends(requier_project_manager)]
+    _: Annotated[User, Depends(requier_project_manager)]
 ):
-
-    logger.info(
-        "Delete board: proejct_id = %s user_id = %s",
-        project_id,
-        current_user.id
-    )
 
     await db_delete_board(
         project_id,
         session
-    )
-
-    logger.info(
-        "Board deleted: project_id = %s user_id = %s",
-        project_id,
-        current_user.id
     )

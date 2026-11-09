@@ -24,7 +24,7 @@ from repositories import (
     db_verify_email
 )
 from jwt.exceptions import InvalidTokenError
-from config import SessionDep, Prefix, Tags
+from config import SessionDep, Prefix, Tags, log_execute
 from typing import Annotated
 import logging
 
@@ -33,6 +33,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix=Prefix.auth, tags=[Tags.auth])
 
 
+@log_execute
 @router.post(
     '/register',
     status_code=status.HTTP_201_CREATED
@@ -43,8 +44,6 @@ async def register(
     response: Response,
     request: Request
 ) -> dict[str, str]:
-
-    logger.info("User register started")
 
     hashed_password = hash_password(data.password)
 
@@ -79,21 +78,18 @@ async def register(
         samesite='lax'
     )
 
-    logger.info("User registere successful")
-
     return {
         'message': 'user registered'
     }
 
 
+@log_execute
 @router.post('/login')
 async def login(
     data: Annotated[Login, Form()],
     session: SessionDep,
     response: Response
 ) -> dict[str, str]:
-
-    logger.info("User login started")
 
     user = await get_user(session, data)
 
@@ -130,13 +126,12 @@ async def login(
         samesite='lax'
     )
 
-    logger.info("User login successful")
-
     return {
         'message': 'user loged'
     }
 
 
+@log_execute
 @router.post(
     '/refresh',
     status_code=status.HTTP_204_NO_CONTENT
@@ -194,12 +189,8 @@ async def refresh(
         samesite='lax'
     )
 
-    logger.info(
-        "Token refresh successfull: username = %s",
-        refresh_payload["sub"]
-    )
 
-
+@log_execute
 @router.post(
     '/logout',
     status_code=status.HTTP_204_NO_CONTENT
@@ -216,13 +207,12 @@ async def logout(
     logger.info("User logout successful")
 
 
+@log_execute
 @router.get('/me', response_model=ResponseAuthMe)
 async def me(
     request: Request,
     session: SessionDep
 ) -> ResponseAuthMe:
-
-    logger.info("Get user data: request started")
 
     access_token = request.cookies.get('access_token')
 
@@ -244,22 +234,14 @@ async def me(
 
     data = await get_user(session, payload)
 
-    logger.info(
-        "Get user data: user_id = %s",
-        data.id
-    )
-
     return data
 
 
+@log_execute
 @router.post("/verify-email")
 async def verify_email(
     session: SessionDep,
     data: VerifyEmail
 ):
 
-    logger.info("Start verification code")
-
     await db_verify_email(session, data)
-
-    logger.info("Code verificated")

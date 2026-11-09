@@ -1,7 +1,9 @@
 from config import (
+    log_execute,
+    SessionDep,
     Prefix,
     Tags,
-    SessionDep)
+)
 
 from models import (
     ResponseComment,
@@ -37,6 +39,7 @@ router = APIRouter(
 )
 
 
+@log_execute
 @router.post(
     '',
     response_model=ResponseComment,
@@ -51,15 +54,6 @@ async def add_comment(
     current_user: Annotated[User, Depends(requier_project_member)]
 ):
 
-    logger.info(
-        "Create comment: project_id = %s "
-        "column_id = %s task_id = %s user_id = %s",
-        project_id,
-        column_id,
-        task_id,
-        current_user.id
-    )
-
     comment = await db_add_comment(
         project_id,
         column_id,
@@ -69,18 +63,10 @@ async def add_comment(
         current_user
     )
 
-    logger.info(
-        "Created comment: project_id = %s "
-        "column_id = %s task_id = %s user_id = %s",
-        project_id,
-        column_id,
-        task_id,
-        current_user.id
-    )
-
     return comment
 
 
+@log_execute
 @router.get(
     '',
     response_model=list[ResponseComment]
@@ -93,15 +79,6 @@ async def get_comments(
     current_user: Annotated[User, Depends(requier_project_member)]
 ):
 
-    logger.info(
-        "Get comments: project_id = %s column_id = %s "
-        "task_id = %s user_id = %s",
-        project_id,
-        column_id,
-        task_id,
-        current_user.id
-    )
-
     comments = await db_get_comments(
         project_id,
         column_id,
@@ -110,18 +87,10 @@ async def get_comments(
         current_user
     )
 
-    logger.info(
-        "Comments retrieved: project_id = %s column_id = %s "
-        "task_id = %s user_id = %s",
-        project_id,
-        column_id,
-        task_id,
-        current_user.id
-    )
-
     return comments
 
 
+@log_execute
 @router.get(
     '/{comment_id}',
     response_model=ResponseComment
@@ -132,18 +101,8 @@ async def get_comment(
     task_id: int,
     comment_id: int,
     session: SessionDep,
-    current_user: Annotated[User, Depends(requier_project_member)]
+    _: Annotated[User, Depends(requier_project_member)]
 ):
-
-    logger.info(
-        "Get comment: project_id = %s column_id = %s "
-        "task_id = %s comment_id = %s user_id = %s",
-        project_id,
-        column_id,
-        task_id,
-        comment_id,
-        current_user.id
-    )
 
     comment = await db_get_comment(
         project_id,
@@ -153,19 +112,10 @@ async def get_comment(
         session,
     )
 
-    logger.info(
-        "Comment retrieved: project_id = %s column_id = %s "
-        "task_id = %s comment_id = %s user_id = %s",
-        project_id,
-        column_id,
-        task_id,
-        comment_id,
-        current_user.id
-    )
-
     return comment
 
 
+@log_execute
 @router.patch(
     '/{comment_id}',
     response_model=ResponseComment
@@ -177,18 +127,8 @@ async def update_comment(
     comment_id: int,
     data: UpdateComment,
     session: SessionDep,
-    current_user: Annotated[User, Depends(requier_comment_owner_or_manager)]
+    _: Annotated[User, Depends(requier_comment_owner_or_manager)]
 ):
-
-    logger.info(
-        "Update comment: project_id = %s column_id = %s "
-        "task_id = %s comment_id = %s user_id = %s",
-        project_id,
-        column_id,
-        task_id,
-        comment_id,
-        current_user.id
-    )
 
     comment = await db_update_comment(
         project_id,
@@ -199,19 +139,10 @@ async def update_comment(
         session
     )
 
-    logger.info(
-        "Comment updated: project_id = %s column_id = %s "
-        "task_id = %s comment_id = %s user_id = %s",
-        project_id,
-        column_id,
-        task_id,
-        comment_id,
-        current_user.id
-    )
-
     return comment
 
 
+@log_execute
 @router.delete(
     '/{comment_id}',
     status_code=status.HTTP_204_NO_CONTENT
@@ -222,18 +153,8 @@ async def delete_comment(
     task_id: int,
     comment_id: int,
     session: SessionDep,
-    current_user: Annotated[User, Depends(requier_comment_owner_or_manager)]
+    _: Annotated[User, Depends(requier_comment_owner_or_manager)]
 ):
-
-    logger.info(
-        "Delete comment: project_id = %s column_id = %s "
-        "task_id = %s comment_id = %s user_id = %s",
-        project_id,
-        column_id,
-        task_id,
-        comment_id,
-        current_user.id
-    )
 
     await db_delete_comment(
         project_id,
@@ -241,14 +162,4 @@ async def delete_comment(
         task_id,
         comment_id,
         session
-    )
-
-    logger.info(
-        "Comment deleted: : project_id = %s column_id = %s "
-        "task_id = %s comment_id = %s user_id = %s",
-        project_id,
-        column_id,
-        task_id,
-        comment_id,
-        current_user.id
     )
